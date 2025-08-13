@@ -5,7 +5,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/siroj05/portfolio/internal/dto"
 	"github.com/siroj05/portfolio/internal/repository/interfaces"
 	"github.com/siroj05/portfolio/internal/response"
@@ -63,15 +65,15 @@ func (h *MessagesHandler) DeleteMessages(w http.ResponseWriter, r *http.Request)
 	w.Header().Set("Content-Type", "application/json")
 	ctx := context.Background()
 
-	var id int64
-	err := json.NewDecoder(r.Body).Decode(&id)
-
+	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	i64 := int64(id)
 	if err != nil {
-		response.Error(w, http.StatusBadRequest, "Invalid request", err.Error())
+		response.Error(w, http.StatusInternalServerError, "Invalid id", err.Error())
 		return
 	}
 
-	err = h.Repo.Delete(ctx, id)
+	err = h.Repo.Delete(ctx, i64)
 	if err != nil {
 		response.Error(w, http.StatusInternalServerError, "Failed to delete message", err.Error())
 		return

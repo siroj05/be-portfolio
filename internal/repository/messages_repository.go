@@ -38,3 +38,22 @@ func (r *MessagesRepository) Create(ctx context.Context, req dto.MessageDto) err
 
 	return nil
 }
+
+func (r *MessagesRepository) GetAll(ctx context.Context) ([]dto.MessageDto, error) {
+	query := "SELECT * FROM messages"
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var req = make([]dto.MessageDto, 0)
+	for rows.Next() {
+		var m dto.MessageDto
+		rows.Scan(&m.ID, &m.Email, &m.Messages, &m.IsRead, &m.CreatedAt)
+		req = append(req, m)
+	}
+
+	return req, nil
+}

@@ -13,4 +13,5 @@ func MessagesRoutes(r *mux.Router, db *sql.DB) {
 	handler := handlers.NewMessagesHandler(repo)
 
 	r.HandleFunc("/messages/send", handler.CreateMessage).Methods("POST")
+	r.HandleFunc("/messages", handler.GetAllMessages).Methods("GET")
 }

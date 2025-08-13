@@ -8,6 +8,7 @@ import (
 
 	"github.com/siroj05/portfolio/internal/dto"
 	"github.com/siroj05/portfolio/internal/repository/interfaces"
+	"github.com/siroj05/portfolio/internal/response"
 )
 
 type MessagesHandler struct {
@@ -28,7 +29,7 @@ func (h *MessagesHandler) CreateMessage(w http.ResponseWriter, r *http.Request) 
 	err := json.NewDecoder(r.Body).Decode(&req)
 
 	if err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		response.Error(w, http.StatusBadRequest, "Invalid request body", err.Error())
 		return
 	}
 
@@ -36,10 +37,24 @@ func (h *MessagesHandler) CreateMessage(w http.ResponseWriter, r *http.Request) 
 
 	if err != nil {
 		log.Println(err)
-		http.Error(w, "Failed to create message", http.StatusInternalServerError)
+		response.Error(w, http.StatusInternalServerError, "Failed to create message", err.Error())
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(req)
+	response.Success(w, "Data berhasil diambil", req)
+}
+
+func (h *MessagesHandler) GetAllMessages(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+
+	result, err := h.Repo.GetAll(ctx)
+
+	if err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusInternalServerError, "Failed to get message", err.Error())
+		return
+	}
+
+	response.Success(w, "Data berhasil diambil", result)
 }

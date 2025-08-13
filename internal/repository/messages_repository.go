@@ -30,7 +30,7 @@ func NewMessagesRepository(db *sql.DB) *MessagesRepository {
 func (r *MessagesRepository) Create(ctx context.Context, req dto.MessageDto) error {
 	query := "INSERT INTO messages (email, messages, is_read) VALUES (?, ?, ?)"
 
-	_, err := r.db.ExecContext(ctx, query, req.Email, req.Messages, req.IsRead)
+	_, err := r.db.ExecContext(ctx, query, req.Email, req.Message, req.IsRead)
 
 	if err != nil {
 		return err
@@ -51,7 +51,7 @@ func (r *MessagesRepository) GetAll(ctx context.Context) ([]dto.MessageDto, erro
 	var req = make([]dto.MessageDto, 0)
 	for rows.Next() {
 		var m dto.MessageDto
-		rows.Scan(&m.ID, &m.Email, &m.Messages, &m.IsRead, &m.CreatedAt)
+		rows.Scan(&m.ID, &m.Email, &m.Message, &m.IsRead, &m.CreatedAt)
 		req = append(req, m)
 	}
 

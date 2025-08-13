@@ -57,3 +57,12 @@ func (r *MessagesRepository) GetAll(ctx context.Context) ([]dto.MessageDto, erro
 
 	return req, nil
 }
+
+func (r *MessagesRepository) Delete(ctx context.Context, id int64) error {
+	_, err := r.db.ExecContext(ctx, "DELETE FROM messages WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

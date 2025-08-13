@@ -58,3 +58,24 @@ func (h *MessagesHandler) GetAllMessages(w http.ResponseWriter, r *http.Request)
 
 	response.Success(w, "Data berhasil diambil", result)
 }
+
+func (h *MessagesHandler) DeleteMessages(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+
+	var id int64
+	err := json.NewDecoder(r.Body).Decode(&id)
+
+	if err != nil {
+		response.Error(w, http.StatusBadRequest, "Invalid request", err.Error())
+		return
+	}
+
+	err = h.Repo.Delete(ctx, id)
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "Failed to delete message", err.Error())
+		return
+	}
+
+	response.Success(w, "Delete message successfully", nil)
+}

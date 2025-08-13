@@ -40,7 +40,7 @@ func (r *MessagesRepository) Create(ctx context.Context, req dto.MessageDto) err
 }
 
 func (r *MessagesRepository) GetAll(ctx context.Context) ([]dto.MessageDto, error) {
-	query := "SELECT * FROM messages"
+	query := "SELECT * FROM messages ORDER BY created_at DESC"
 	rows, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err

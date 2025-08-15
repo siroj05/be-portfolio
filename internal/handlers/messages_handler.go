@@ -87,7 +87,6 @@ func (h *MessagesHandler) GetAllMessages(w http.ResponseWriter, r *http.Request)
 func (h *MessagesHandler) DeleteMessages(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	ctx := context.Background()
-
 	params := mux.Vars(r)
 	id, err := strconv.Atoi(params["id"])
 	i64 := int64(id)
@@ -108,7 +107,6 @@ func (h *MessagesHandler) DeleteMessages(w http.ResponseWriter, r *http.Request)
 func (h *MessagesHandler) DeleteAllMessages(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	ctx := context.Background()
-
 	err := h.Repo.DeleteAll(ctx)
 	if err != nil {
 		log.Println(err)

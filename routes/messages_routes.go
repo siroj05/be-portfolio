@@ -15,6 +15,7 @@ func MessagesRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/messages/send", handler.CreateMessage).Methods("POST")
 	r.HandleFunc("/messages", handler.GetAllMessages).Methods("GET")
 	r.HandleFunc("/messages/{id}", handler.DeleteMessages).Methods("DELETE")
+	r.HandleFunc("/messages/delete-all", handler.DeleteAllMessages).Methods("DELETE")
 	r.HandleFunc("/messages/{id}/mark", handler.MarkReadMessage).Methods("PUT")
 	r.HandleFunc("/messages/mark-all", handler.MarkAllMessage).Methods("PUT")
 }

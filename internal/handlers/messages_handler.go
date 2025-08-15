@@ -105,6 +105,20 @@ func (h *MessagesHandler) DeleteMessages(w http.ResponseWriter, r *http.Request)
 	response.Success(w, "Successfully deleted message", nil)
 }
 
+func (h *MessagesHandler) DeleteAllMessages(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+
+	err := h.Repo.DeleteAll(ctx)
+	if err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusInternalServerError, "Failed to delete all messages", err.Error())
+		return
+	}
+
+	response.Success(w, "Successfully deleted all messages", nil)
+}
+
 func (h *MessagesHandler) MarkReadMessage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	ctx := context.Background()

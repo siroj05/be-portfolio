@@ -67,6 +67,14 @@ func (r *MessagesRepository) Delete(ctx context.Context, id int64) error {
 	return nil
 }
 
+func (r *MessagesRepository) DeleteAll(ctx context.Context) error {
+	_, err := r.db.ExecContext(ctx, "DELETE FROM messages")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *MessagesRepository) Mark(ctx context.Context, id int64, IsMark dto.MarkMessageDto) error {
 	_, err := r.db.ExecContext(ctx, "UPDATE messages SET is_read = ? WHERE id = ?", IsMark.Mark, id)
 	if err != nil {

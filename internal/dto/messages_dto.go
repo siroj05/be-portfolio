@@ -7,3 +7,7 @@ type MessageDto struct {
 	IsRead    bool   `json:"isRead"`
 	CreatedAt string `json:"createdAt"`
 }
+
+type MarkMessageDto struct {
+	Mark bool `json:"mark"`
+}

@@ -81,3 +81,34 @@ func (h *MessagesHandler) DeleteMessages(w http.ResponseWriter, r *http.Request)
 
 	response.Success(w, "Delete message successfully", nil)
 }
+
+func (h *MessagesHandler) MarkReadMessage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+	params := mux.Vars(r)
+	id, err := strconv.Atoi(params["id"])
+	i64 := int64(id)
+	if err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusInternalServerError, "Invalid id", err.Error())
+		return
+	}
+
+	var req dto.MarkMessageDto
+	err = json.NewDecoder(r.Body).Decode(&req)
+
+	if err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusBadRequest, "Invalid request", err.Error())
+		return
+	}
+
+	err = h.Repo.Mark(ctx, i64, req)
+	if err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusInternalServerError, "Failed to read message", err.Error())
+		return
+	}
+
+	response.Success(w, "Success to read message", nil)
+}

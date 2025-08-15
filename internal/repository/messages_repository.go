@@ -75,3 +75,12 @@ func (r *MessagesRepository) Mark(ctx context.Context, id int64, IsMark dto.Mark
 
 	return nil
 }
+
+func (r *MessagesRepository) MarkAll(ctx context.Context) error {
+	_, err := r.db.ExecContext(ctx, "UPDATE messages SET is_read = 1 WHERE is_read = 0")
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -81,7 +81,7 @@ func (h *MessagesHandler) GetAllMessages(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	response.Success(w, "Data berhasil diambil", result)
+	response.Success(w, "Successfully get all massage", result)
 }
 
 func (h *MessagesHandler) DeleteMessages(w http.ResponseWriter, r *http.Request) {
@@ -102,7 +102,7 @@ func (h *MessagesHandler) DeleteMessages(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	response.Success(w, "Delete message successfully", nil)
+	response.Success(w, "Successfully deleted message", nil)
 }
 
 func (h *MessagesHandler) MarkReadMessage(w http.ResponseWriter, r *http.Request) {
@@ -134,4 +134,18 @@ func (h *MessagesHandler) MarkReadMessage(w http.ResponseWriter, r *http.Request
 	}
 
 	response.Success(w, "Success to read message", nil)
+}
+
+func (h *MessagesHandler) MarkAllMessage(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+
+	err := h.Repo.MarkAll(ctx)
+	if err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusInternalServerError, "Failed to mark all messages as read", err.Error())
+		return
+	}
+
+	response.Success(w, "Successfully marked all messages as read", nil)
 }

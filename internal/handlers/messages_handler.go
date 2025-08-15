@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/siroj05/portfolio/internal/dto"
@@ -35,6 +36,28 @@ func (h *MessagesHandler) CreateMessage(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
+	// Validasi
+	if len(req.Email) > 50 {
+		response.Error(w, http.StatusBadRequest, "Email too long (max 50)", err.Error())
+		return
+	}
+
+	if strings.TrimSpace(req.Email) == "" {
+		response.Error(w, http.StatusBadRequest, "Email is required", err.Error())
+		return
+	}
+
+	if strings.TrimSpace(req.Message) == "" {
+		response.Error(w, http.StatusBadRequest, "Message is required", err.Error())
+		return
+	}
+
+	if len(req.Message) > 500 {
+		response.Error(w, http.StatusBadRequest, "Message too long (max 500)", err.Error())
+		return
+	}
+
+	// simpan ke db
 	err = h.Repo.Create(ctx, req)
 
 	if err != nil {
@@ -43,7 +66,7 @@ func (h *MessagesHandler) CreateMessage(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	response.Success(w, "Data berhasil diambil", req)
+	response.Success(w, "Create message success", req)
 }
 
 func (h *MessagesHandler) GetAllMessages(w http.ResponseWriter, r *http.Request) {

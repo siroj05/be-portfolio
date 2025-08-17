@@ -7,5 +7,6 @@ import (
 )
 
 type AuthRepository interface {
+	Create(ctx context.Context, req dto.LoginDto) error
 	Login(ctx context.Context, req dto.LoginDto) (string, error)
 }

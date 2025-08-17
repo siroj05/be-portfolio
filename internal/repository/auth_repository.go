@@ -9,6 +9,7 @@ import (
 	"github.com/siroj05/portfolio/config"
 	"github.com/siroj05/portfolio/internal/dto"
 	"github.com/siroj05/portfolio/internal/models"
+	"github.com/siroj05/portfolio/utils"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -50,4 +51,19 @@ func (r *AuthRepository) Login(ctx context.Context, req dto.LoginDto) (string, e
 	}
 
 	return TokenString, nil
+}
+
+func (r *AuthRepository) Create(ctx context.Context, req dto.LoginDto) error {
+	hashedPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.db.ExecContext(ctx, "INSERT INTO user (name, password) VALUES (?, ?)", req.Name, hashedPassword)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

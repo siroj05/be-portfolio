@@ -53,3 +53,26 @@ func (h *AuthHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
 		"message": "Login success",
 	})
 }
+
+func (h *AuthHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	var req dto.LoginDto
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusBadRequest, "Invalid request", err.Error())
+		return
+	}
+
+	ctx := context.Background()
+	err := h.Repo.Create(ctx, req)
+
+	if err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusInternalServerError, "Failed to create user", err.Error())
+		return
+	}
+
+	json.NewEncoder(w).Encode(map[string]string{
+		"message": "User created successfully",
+	})
+}

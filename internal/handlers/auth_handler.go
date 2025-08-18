@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/siroj05/portfolio/internal/dto"
 	"github.com/siroj05/portfolio/internal/repository/interfaces"
@@ -40,7 +41,7 @@ func (h *AuthHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &http.Cookie{
-		Name:     "__session",
+		Name:     "session",
 		Value:    TokenString,
 		Path:     "/",
 		HttpOnly: true,
@@ -52,6 +53,21 @@ func (h *AuthHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"message": "Login success",
 	})
+}
+
+func (h *AuthHandler) LogoutUser(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session",
+		Value:    "",
+		Path:     "/",
+		HttpOnly: true,
+		Secure:   false,
+		SameSite: http.SameSiteLaxMode,
+		Expires:  time.Unix(0, 0),
+		MaxAge:   -1,
+	})
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"message":"Logout success"}`))
 }
 
 func (h *AuthHandler) CreateUser(w http.ResponseWriter, r *http.Request) {

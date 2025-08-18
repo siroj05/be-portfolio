@@ -17,6 +17,7 @@ func main() {
 
 	r := mux.NewRouter()
 	routes.MessagesRoutes(r, config.DB)
+	routes.AuthRoutes(r, config.DB)
 
 	corsHandler := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},

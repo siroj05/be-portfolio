@@ -17,7 +17,7 @@ const claimsKey contextKey = "claims"
 func JWTauth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var jwtSecret = []byte(config.JWTSecret)
-		cookie, err := r.Cookie("token")
+		cookie, err := r.Cookie("session")
 
 		if len(jwtSecret) == 0 {
 			log.Println("Jwt secret not set")

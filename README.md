@@ -5,3 +5,4 @@ Golang
 3. jwt v5
 4. godotenv
 5. crypto
+6. google uuid

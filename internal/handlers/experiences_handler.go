@@ -28,8 +28,6 @@ func (h *ExperiencesHandler) CreateExperience(w http.ResponseWriter, r *http.Req
 
 	var req dto.ExperiencesDto
 	err := json.NewDecoder(r.Body).Decode(&req)
-	log.Println("disini format=>")
-	log.Println(req)
 	if err != nil {
 		log.Println(err)
 		response.Error(w, http.StatusBadRequest, "Invalid request", err.Error())

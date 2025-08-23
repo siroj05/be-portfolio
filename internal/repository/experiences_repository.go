@@ -20,7 +20,7 @@ func NewExperiencesRepository(db *sql.DB) *ExperiencesRepository {
 
 func (r *ExperiencesRepository) Create(ctx context.Context, req dto.ExperiencesDto) error {
 	id := uuid.New().String()
-	_, err := r.db.ExecContext(ctx, "INSERT INTO experiences (id, office, position, start, end, description) VALUES (?, ?, ?, ?, ?, ?)", id, req.Office, req.Position, req.Start, req.End, req.Description)
+	_, err := r.db.ExecContext(ctx, "INSERT INTO experiences (id, office, position, start, end, description) VALUES (?, ?, ?, ?, ?, ?)", id, req.Office, req.Position, req.Start.Format("2006-01-02"), req.End.Format("2006-01-02"), req.Description)
 	if err != nil {
 		return err
 	}

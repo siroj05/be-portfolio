@@ -1,12 +1,13 @@
 package utils
 
 import (
+	"database/sql"
 	"strings"
 	"time"
 )
 
 type DateOnly struct {
-	time.Time
+	sql.NullTime
 }
 
 func (d *DateOnly) UnmarshalJSON(b []byte) error {

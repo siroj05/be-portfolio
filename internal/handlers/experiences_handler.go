@@ -51,15 +51,15 @@ func (h *ExperiencesHandler) CreateExperience(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if req.Start.IsZero() {
+	if req.Start.Valid {
 		response.Error(w, http.StatusBadRequest, "Start is required", err.Error())
 		return
 	}
 
-	if req.End.IsZero() {
-		response.Error(w, http.StatusBadRequest, "End is required", err.Error())
-		return
-	}
+	// if req.End.IsZero() {
+	// 	response.Error(w, http.StatusBadRequest, "End is required", err.Error())
+	// 	return
+	// }
 
 	err = h.Repo.Create(ctx, req)
 
@@ -70,4 +70,18 @@ func (h *ExperiencesHandler) CreateExperience(w http.ResponseWriter, r *http.Req
 	}
 
 	response.Success(w, "Create experience success", nil)
+}
+
+func (h *ExperiencesHandler) GetAllExperiences(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+
+	res, err := h.Repo.GetAll(ctx)
+	if err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusInternalServerError, "Failed to get experiences", err.Error())
+		return
+	}
+
+	response.Success(w, "Successfully get all experiences", res)
 }

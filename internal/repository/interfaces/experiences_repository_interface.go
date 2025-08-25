@@ -8,4 +8,5 @@ import (
 
 type ExperiencesRepository interface {
 	Create(ctx context.Context, req dto.ExperiencesDto) error
+	GetAll(ctx context.Context) ([]dto.ExperiencesListDto, error)
 }

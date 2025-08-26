@@ -35,8 +35,7 @@ func (h *AuthHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	TokenString, err := h.Repo.Login(ctx, req)
 
 	if err != nil {
-		log.Println(err)
-		response.Error(w, http.StatusUnauthorized, "Wrong name or password", err.Error())
+		response.Error(w, http.StatusUnauthorized, err.Error(), err.Error())
 		return
 	}
 

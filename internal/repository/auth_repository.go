@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -29,12 +31,15 @@ func (r *AuthRepository) Login(ctx context.Context, req dto.LoginDto) (string, e
 	var user models.Auth
 	err := row.Scan(&user.ID, &user.Name, &user.Password)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", fmt.Errorf("Invalid username")
+		}
 		return "", err
 	}
 
 	// compare password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
-		return "", err
+		return "", fmt.Errorf("Invalid username or password")
 	}
 
 	claims := jwt.MapClaims{

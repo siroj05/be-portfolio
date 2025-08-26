@@ -95,6 +95,7 @@ func (h *ExperiencesHandler) GetExperienceById(w http.ResponseWriter, r *http.Re
 
 	var res dto.ExperiencesListDto
 	err := h.Repo.GetById(ctx, id, &res)
+
 	if err != nil {
 		response.Error(w, http.StatusInternalServerError, "Failed to get data", err.Error())
 		return

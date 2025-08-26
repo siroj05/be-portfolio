@@ -44,10 +44,17 @@ func (r *ExperiencesRepository) Create(ctx context.Context, req dto.ExperiencesD
 }
 
 func (r *ExperiencesRepository) GetById(ctx context.Context, id string, req *dto.ExperiencesListDto) error {
+	var end sql.NullString
 	row := r.db.QueryRowContext(ctx, "SELECT * FROM experiences WHERE id = ?", id)
-	err := row.Scan(&req.ID, &req.Office, &req.Position, &req.Start, &req.End, &req.Description)
+	err := row.Scan(&req.ID, &req.Office, &req.Position, &req.Start, &end, &req.Description)
 	if err != nil {
 		return err
+	}
+
+	if end.Valid {
+		req.End = end.String
+	} else {
+		req.End = ""
 	}
 
 	return nil

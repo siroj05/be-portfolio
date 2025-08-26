@@ -3,7 +3,6 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"log"
 
 	"github.com/google/uuid"
 	"github.com/siroj05/portfolio/internal/dto"
@@ -44,8 +43,17 @@ func (r *ExperiencesRepository) Create(ctx context.Context, req dto.ExperiencesD
 	return nil
 }
 
+func (r *ExperiencesRepository) GetById(ctx context.Context, id string, req *dto.ExperiencesListDto) error {
+	row := r.db.QueryRowContext(ctx, "SELECT * FROM experiences WHERE id = ?", id)
+	err := row.Scan(&req.ID, &req.Office, &req.Position, &req.Start, &req.End, &req.Description)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *ExperiencesRepository) GetAll(ctx context.Context) ([]dto.ExperiencesListDto, error) {
-	log.Println("masuk")
 	query := `SELECT id, office, position, description, start, end FROM experiences ORDER BY start DESC`
 	row, err := r.db.QueryContext(ctx, query)
 	if err != nil {

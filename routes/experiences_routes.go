@@ -17,4 +17,5 @@ func ExperiencesRoutes(r *mux.Router, db *sql.DB) {
 	r.Handle("/experiences/save", middleware.JWTauth(http.HandlerFunc(handler.CreateExperience))).Methods("POST")
 	r.Handle("/experiences", middleware.JWTauth(http.HandlerFunc(handler.GetAllExperiences))).Methods("GET")
 	r.Handle("/experiences/{id}", middleware.JWTauth(http.HandlerFunc(handler.DeleteExperiences))).Methods("DELETE")
+	r.Handle("/experiences/{id}", middleware.JWTauth(http.HandlerFunc(handler.GetExperienceById))).Methods("GET")
 }

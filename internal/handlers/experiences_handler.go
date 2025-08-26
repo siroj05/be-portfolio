@@ -87,6 +87,22 @@ func (h *ExperiencesHandler) GetAllExperiences(w http.ResponseWriter, r *http.Re
 	response.Success(w, "Successfully get all experiences", res)
 }
 
+func (h *ExperiencesHandler) GetExperienceById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+	params := mux.Vars(r)
+	id := params["id"]
+
+	var res dto.ExperiencesListDto
+	err := h.Repo.GetById(ctx, id, &res)
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "Failed to get data", err.Error())
+		return
+	}
+
+	response.Success(w, "Successfully get data", res)
+}
+
 func (h *ExperiencesHandler) DeleteExperiences(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	ctx := context.Background()

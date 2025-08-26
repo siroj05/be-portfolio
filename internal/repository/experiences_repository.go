@@ -37,7 +37,7 @@ func (r *ExperiencesRepository) Create(ctx context.Context, req dto.ExperiencesD
 
 func (r *ExperiencesRepository) GetAll(ctx context.Context) ([]dto.ExperiencesListDto, error) {
 	log.Println("masuk")
-	query := `SELECT id, office, position, description, start FROM experiences`
+	query := `SELECT id, office, position, description, start, end FROM experiences ORDER BY start DESC`
 	row, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
@@ -48,16 +48,15 @@ func (r *ExperiencesRepository) GetAll(ctx context.Context) ([]dto.ExperiencesLi
 
 	for row.Next() {
 		var e dto.ExperiencesListDto
-		log.Println("masuk")
 		row.Scan(
 			&e.ID,
 			&e.Office,
 			&e.Position,
 			&e.Description,
 			&e.Start,
+			&e.End,
 		)
 		res = append(res, e)
 	}
-	log.Println(res)
 	return res, nil
 }

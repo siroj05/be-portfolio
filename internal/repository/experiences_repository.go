@@ -19,6 +19,15 @@ func NewExperiencesRepository(db *sql.DB) *ExperiencesRepository {
 	}
 }
 
+func (r *ExperiencesRepository) Delete(ctx context.Context, id string) error {
+	_, err := r.db.ExecContext(ctx, "DELETE FROM experiences WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *ExperiencesRepository) Create(ctx context.Context, req dto.ExperiencesDto) error {
 	id := uuid.New().String()
 	var end interface{}

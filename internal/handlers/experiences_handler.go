@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gorilla/mux"
 	"github.com/siroj05/portfolio/internal/dto"
 	"github.com/siroj05/portfolio/internal/repository/interfaces"
 	"github.com/siroj05/portfolio/internal/response"
@@ -84,4 +85,19 @@ func (h *ExperiencesHandler) GetAllExperiences(w http.ResponseWriter, r *http.Re
 	}
 
 	response.Success(w, "Successfully get all experiences", res)
+}
+
+func (h *ExperiencesHandler) DeleteExperiences(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+	params := mux.Vars(r)
+	id := params["id"]
+
+	err := h.Repo.Delete(ctx, id)
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "Failed to delete experience", err.Error())
+		return
+	}
+
+	response.Success(w, "Successfully deleted message", nil)
 }

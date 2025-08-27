@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"log"
 
 	"github.com/google/uuid"
 	"github.com/siroj05/portfolio/internal/dto"
@@ -30,12 +31,38 @@ func (r *ExperiencesRepository) Delete(ctx context.Context, id string) error {
 func (r *ExperiencesRepository) Create(ctx context.Context, req dto.ExperiencesDto) error {
 	id := uuid.New().String()
 	var end interface{}
+	log.Println(req.End)
 	if req.End.Valid {
 		end = req.End.Time.Format("2006-01-02")
 	} else {
 		end = nil
 	}
 	_, err := r.db.ExecContext(ctx, "INSERT INTO experiences (id, office, position, start, end, description) VALUES (?, ?, ?, ?, ?, ?)", id, req.Office, req.Position, req.Start.Time.Format("2006-01-02"), end, req.Description)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *ExperiencesRepository) Update(ctx context.Context, req dto.ExperiencesDto) error {
+	query := `
+	UPDATE experiences 
+	SET 
+	office = ?,
+	position = ?,
+	start = ?,
+	end = ?,
+	description = ?
+	WHERE id = ?
+	`
+	var end interface{}
+	if req.End.Valid {
+		end = req.End.Time.Format("2006-01-02")
+	} else {
+		end = nil
+	}
+	_, err := r.db.ExecContext(ctx, query, req.Office, req.Position, req.Start.Time.Format("2006-01-02"), end, req.Description, req.ID)
 	if err != nil {
 		return err
 	}

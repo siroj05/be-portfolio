@@ -118,3 +118,25 @@ func (h *ExperiencesHandler) DeleteExperiences(w http.ResponseWriter, r *http.Re
 
 	response.Success(w, "Successfully deleted message", nil)
 }
+
+func (h *ExperiencesHandler) UpadateExperience(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+
+	var req dto.ExperiencesDto
+	err := json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusBadRequest, "Invalid request body", err.Error())
+		return
+	}
+
+	err = h.Repo.Update(ctx, req)
+	if err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusInternalServerError, "Failed to update experience", err.Error())
+		return
+	}
+
+	response.Success(w, "Successfully to update experience", nil)
+}

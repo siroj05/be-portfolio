@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
-	"log"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/siroj05/portfolio/internal/dto"
@@ -30,14 +30,15 @@ func (r *ExperiencesRepository) Delete(ctx context.Context, id string) error {
 
 func (r *ExperiencesRepository) Create(ctx context.Context, req dto.ExperiencesDto) error {
 	id := uuid.New().String()
+
 	var end interface{}
-	log.Println(req.End)
-	if req.End.Valid {
-		end = req.End.Time.Format("2006-01-02")
-	} else {
+	if strings.TrimSpace(req.End) == "" {
 		end = nil
+	} else {
+		end = req.End
 	}
-	_, err := r.db.ExecContext(ctx, "INSERT INTO experiences (id, office, position, start, end, description) VALUES (?, ?, ?, ?, ?, ?)", id, req.Office, req.Position, req.Start.Time.Format("2006-01-02"), end, req.Description)
+
+	_, err := r.db.ExecContext(ctx, "INSERT INTO experiences (id, office, position, start, end, description) VALUES (?, ?, ?, ?, ?, ?)", id, req.Office, req.Position, req.Start, end, req.Description)
 	if err != nil {
 		return err
 	}
@@ -57,12 +58,12 @@ func (r *ExperiencesRepository) Update(ctx context.Context, req dto.ExperiencesD
 	WHERE id = ?
 	`
 	var end interface{}
-	if req.End.Valid {
-		end = req.End.Time.Format("2006-01-02")
-	} else {
+	if strings.TrimSpace(req.End) == "" {
 		end = nil
+	} else {
+		end = req.End
 	}
-	_, err := r.db.ExecContext(ctx, query, req.Office, req.Position, req.Start.Time.Format("2006-01-02"), end, req.Description, req.ID)
+	_, err := r.db.ExecContext(ctx, query, req.Office, req.Position, req.Start, end, req.Description, req.ID)
 	if err != nil {
 		return err
 	}

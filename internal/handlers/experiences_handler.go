@@ -52,7 +52,7 @@ func (h *ExperiencesHandler) CreateExperience(w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	if req.Start.Valid {
+	if strings.TrimSpace(req.Start) == "" {
 		response.Error(w, http.StatusBadRequest, "Start is required", err.Error())
 		return
 	}

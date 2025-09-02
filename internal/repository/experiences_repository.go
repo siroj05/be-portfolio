@@ -30,7 +30,6 @@ func (r *ExperiencesRepository) Delete(ctx context.Context, id string) error {
 
 func (r *ExperiencesRepository) Create(ctx context.Context, req dto.ExperiencesDto) error {
 	id := uuid.New().String()
-
 	var end interface{}
 	if strings.TrimSpace(req.End) == "" {
 		end = nil
@@ -38,7 +37,7 @@ func (r *ExperiencesRepository) Create(ctx context.Context, req dto.ExperiencesD
 		end = req.End
 	}
 
-	_, err := r.db.ExecContext(ctx, "INSERT INTO experiences (id, office, position, start, end, description) VALUES (?, ?, ?, ?, ?, ?)", id, req.Office, req.Position, req.Start, end, req.Description)
+	_, err := r.db.ExecContext(ctx, "INSERT INTO experiences (id, office, position, start, end, description, present) VALUES (?, ?, ?, ?, ?, ?, ?)", id, req.Office, req.Position, req.Start, end, req.Description, req.Present)
 	if err != nil {
 		return err
 	}
@@ -54,7 +53,8 @@ func (r *ExperiencesRepository) Update(ctx context.Context, req dto.ExperiencesD
 	position = ?,
 	start = ?,
 	end = ?,
-	description = ?
+	description = ?,
+	present = ?,
 	WHERE id = ?
 	`
 	var end interface{}
@@ -63,7 +63,7 @@ func (r *ExperiencesRepository) Update(ctx context.Context, req dto.ExperiencesD
 	} else {
 		end = req.End
 	}
-	_, err := r.db.ExecContext(ctx, query, req.Office, req.Position, req.Start, end, req.Description, req.ID)
+	_, err := r.db.ExecContext(ctx, query, req.Office, req.Position, req.Start, end, req.Description, req.Present, req.ID)
 	if err != nil {
 		return err
 	}
@@ -74,7 +74,7 @@ func (r *ExperiencesRepository) Update(ctx context.Context, req dto.ExperiencesD
 func (r *ExperiencesRepository) GetById(ctx context.Context, id string, req *dto.ExperiencesListDto) error {
 	var end sql.NullString
 	row := r.db.QueryRowContext(ctx, "SELECT * FROM experiences WHERE id = ?", id)
-	err := row.Scan(&req.ID, &req.Office, &req.Position, &req.Start, &end, &req.Description)
+	err := row.Scan(&req.ID, &req.Office, &req.Position, &req.Start, &end, &req.Description, &req.Present)
 	if err != nil {
 		return err
 	}
@@ -89,7 +89,7 @@ func (r *ExperiencesRepository) GetById(ctx context.Context, id string, req *dto
 }
 
 func (r *ExperiencesRepository) GetAll(ctx context.Context) ([]dto.ExperiencesListDto, error) {
-	query := `SELECT id, office, position, description, start, end FROM experiences ORDER BY start DESC`
+	query := `SELECT id, office, position, description, start, end, present FROM experiences ORDER BY start DESC`
 	row, err := r.db.QueryContext(ctx, query)
 	if err != nil {
 		return nil, err
@@ -107,6 +107,7 @@ func (r *ExperiencesRepository) GetAll(ctx context.Context) ([]dto.ExperiencesLi
 			&e.Description,
 			&e.Start,
 			&e.End,
+			&e.Present,
 		)
 		res = append(res, e)
 	}

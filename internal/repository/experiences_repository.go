@@ -54,7 +54,7 @@ func (r *ExperiencesRepository) Update(ctx context.Context, req dto.ExperiencesD
 	start = ?,
 	end = ?,
 	description = ?,
-	present = ?,
+	present = ?
 	WHERE id = ?
 	`
 	var end interface{}

@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 12 Agu 2025 pada 18.14
--- Versi server: 10.4.28-MariaDB
--- Versi PHP: 8.0.28
+-- Generation Time: Sep 04, 2025 at 09:08 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,43 +24,26 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Struktur dari tabel `messages`
+-- Table structure for table `experiences`
 --
+-- Error reading structure for table portfolio.experiences: #1932 - Table 'portfolio.experiences' doesn't exist in engine
+-- Error reading data for table portfolio.experiences: #1064 - You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'FROM `portfolio`.`experiences`' at line 1
 
-CREATE TABLE `messages` (
-  `id` int(11) NOT NULL,
-  `email` varchar(128) NOT NULL,
-  `messages` text NOT NULL,
-  `is_read` tinyint(1) NOT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+-- --------------------------------------------------------
 
 --
--- Dumping data untuk tabel `messages`
+-- Table structure for table `messages`
 --
+-- Error reading structure for table portfolio.messages: #1932 - Table 'portfolio.messages' doesn't exist in engine
+-- Error reading data for table portfolio.messages: #1064 - You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'FROM `portfolio`.`messages`' at line 1
 
-INSERT INTO `messages` (`id`, `email`, `messages`, `is_read`, `created_at`) VALUES
-(1, 'pt.best@gmail.com', 'Lo kapan bisa join??', 0, '2025-08-12 16:13:21');
-
---
--- Indexes for dumped tables
---
+-- --------------------------------------------------------
 
 --
--- Indeks untuk tabel `messages`
+-- Table structure for table `user`
 --
-ALTER TABLE `messages`
-  ADD PRIMARY KEY (`id`);
-
---
--- AUTO_INCREMENT untuk tabel yang dibuang
---
-
---
--- AUTO_INCREMENT untuk tabel `messages`
---
-ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+-- Error reading structure for table portfolio.user: #1932 - Table 'portfolio.user' doesn't exist in engine
+-- Error reading data for table portfolio.user: #1064 - You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near 'FROM `portfolio`.`user`' at line 1
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

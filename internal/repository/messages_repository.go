@@ -28,7 +28,7 @@ func NewMessagesRepository(db *sql.DB) *MessagesRepository {
  */
 
 func (r *MessagesRepository) Create(ctx context.Context, req dto.MessageDto) error {
-	query := "INSERT INTO messages (email, messages, is_read) VALUES (?, ?, ?)"
+	query := "INSERT INTO messages (email, message, is_read) VALUES (?, ?, ?)"
 
 	_, err := r.db.ExecContext(ctx, query, req.Email, req.Message, req.IsRead)
 

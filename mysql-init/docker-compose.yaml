@@ -4,19 +4,13 @@ services:
     container_name: portfolio-db
     restart: always
     environment:
-     MYSQL_ROOT_PASSWORD: root
-     MYSQL_DATABASE: portfolio
-     MYSQL_USER: appuser
-     MYSQL_PASSWORD: apppass123
-    command: [
-      "--character-set-server=utf8mb4",
-      "--collation-server=utf8mb4_unicode_ci"
-    ]
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: portfolio   # optional: bikin DB otomatis
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./init:/docker-entrypoint-initdb.d
+      - ./init:/docker-entrypoint-initdb.d  # arahkan ke folder init
 
 volumes:
   db_data:

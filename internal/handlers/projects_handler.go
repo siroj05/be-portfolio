@@ -32,7 +32,7 @@ func (h *ProjectsHandler) CreateProject(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// ambil file
-	file, handler, err := r.FormFile("picture")
+	file, handler, err := r.FormFile("image")
 	if err != nil {
 		response.Error(w, http.StatusBadRequest, "Error retrieving the file", err.Error())
 		return

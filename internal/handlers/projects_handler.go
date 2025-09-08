@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 	"github.com/siroj05/portfolio/internal/dto"
 	"github.com/siroj05/portfolio/internal/repository/interfaces"
 	"github.com/siroj05/portfolio/internal/response"
@@ -36,7 +37,7 @@ func (h *ProjectsHandler) CreateProject(w http.ResponseWriter, r *http.Request) 
 
 	// ambil file
 	file, handler, err := r.FormFile("image")
-	log.Println(file)
+
 	if err != nil {
 		log.Println("error 2")
 		log.Println(err)
@@ -99,4 +100,18 @@ func (h *ProjectsHandler) GetAllProjects(w http.ResponseWriter, r *http.Request)
 	}
 
 	response.Success(w, "Successfully get all projects", res)
+}
+
+func (h *ProjectsHandler) DeleteProject(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+	params := mux.Vars(r)
+	id := params["id"]
+	err := h.Repo.Delete(ctx, id)
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "Failed to delete project", err.Error())
+		return
+	}
+
+	response.Success(w, "Successfully deleted project", nil)
 }

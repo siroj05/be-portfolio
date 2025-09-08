@@ -57,3 +57,11 @@ func (r *ProjectRepository) GetAll(ctx context.Context) ([]dto.ProjectDto, error
 
 	return res, nil
 }
+
+func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
+	_, err := r.db.ExecContext(ctx, `DELETE FROM projects WHERE id = ?`, id)
+	if err != nil {
+		return err
+	}
+	return err
+}

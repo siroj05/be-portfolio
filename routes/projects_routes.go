@@ -17,4 +17,5 @@ func ProjectsRoutes(r *mux.Router, db *sql.DB) {
 	r.PathPrefix("/uploads/").Handler(http.StripPrefix("/uploads", http.FileServer(http.Dir("./uploads"))))
 	r.Handle("/projects/save", middleware.JWTauth(http.HandlerFunc(handler.CreateProject))).Methods("POST")
 	r.Handle("/projects", middleware.JWTauth(http.HandlerFunc(handler.GetAllProjects))).Methods("GET")
+	r.Handle("/projects/{id}", middleware.JWTauth(http.HandlerFunc(handler.DeleteProject))).Methods("DELETE")
 }

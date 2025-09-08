@@ -20,7 +20,7 @@ func main() {
 	routes.MessagesRoutes(r, config.DB)
 	routes.AuthRoutes(r, config.DB)
 	routes.ExperiencesRoutes(r, config.DB)
-
+	routes.ProjectsRoutes(r, config.DB)
 	// handle with middleware
 	handlerWithMiddleware := middleware.Logging(r)
 

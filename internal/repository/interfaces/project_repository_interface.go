@@ -8,4 +8,5 @@ import (
 
 type ProjectRepository interface {
 	Create(ctx context.Context, project dto.ProjectDto) error
+	GetAll(ctx context.Context) ([]dto.ProjectDto, error)
 }

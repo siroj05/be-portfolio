@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 
+	"github.com/google/uuid"
 	"github.com/siroj05/portfolio/internal/dto"
 	"github.com/siroj05/portfolio/internal/repository/interfaces"
 	"github.com/siroj05/portfolio/internal/response"
@@ -21,28 +23,34 @@ func NewProjectHandler(repo interfaces.ProjectRepository) *ProjectsHandler {
 }
 
 func (h *ProjectsHandler) CreateProject(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
 	ctx := context.Background()
 
 	// parse multipart form
 	err := r.ParseMultipartForm(10 << 20) // limit upload size to 10mb
 	if err != nil {
+		log.Println("error 1")
+		log.Println(err)
 		response.Error(w, http.StatusBadRequest, "File too big", err.Error())
 		return
 	}
 
 	// ambil file
 	file, handler, err := r.FormFile("image")
+	log.Println(file)
 	if err != nil {
+		log.Println("error 2")
+		log.Println(err)
 		response.Error(w, http.StatusBadRequest, "Error retrieving the file", err.Error())
 		return
 	}
 	defer file.Close()
 
 	// simpan file di folder uploads lokal
-	filePath := fmt.Sprintf("./uploads/%s", handler.Filename)
+	filePath := fmt.Sprintf("uploads/%s", handler.Filename)
 	dst, err := os.Create(filePath)
 	if err != nil {
+		log.Println("error 3")
+		log.Println(err)
 		response.Error(w, http.StatusInternalServerError, "Unable to save file", err.Error())
 		return
 	}
@@ -50,11 +58,14 @@ func (h *ProjectsHandler) CreateProject(w http.ResponseWriter, r *http.Request) 
 	defer dst.Close()
 	_, err = io.Copy(dst, file)
 	if err != nil {
+		log.Println("error 4")
+		log.Println(err)
 		response.Error(w, http.StatusInternalServerError, "Error saving file", err.Error())
 		return
 	}
-
+	id := uuid.New().String()
 	req := dto.ProjectDto{
+		ID:          id,
 		Title:       r.FormValue("title"),
 		Description: r.FormValue("description"),
 		TechStack:   r.FormValue("techStack"),
@@ -66,9 +77,26 @@ func (h *ProjectsHandler) CreateProject(w http.ResponseWriter, r *http.Request) 
 	err = h.Repo.Create(ctx, req)
 
 	if err != nil {
+		log.Println("error 5")
+		log.Println(err)
 		response.Error(w, http.StatusInternalServerError, "Failed to create project", err.Error())
 		return
 	}
 
 	response.Success(w, "Create project success", req)
+}
+
+func (h *ProjectsHandler) GetAllProjects(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+
+	res, err := h.Repo.GetAll(ctx)
+
+	if err != nil {
+		log.Println(err)
+		response.Error(w, http.StatusInternalServerError, "Failed to get projects", err.Error())
+		return
+	}
+
+	response.Success(w, "Successfully get all projects", res)
 }

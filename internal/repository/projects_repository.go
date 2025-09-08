@@ -18,14 +18,42 @@ func NewProjectRepository(db *sql.DB) *ProjectRepository {
 func (r *ProjectRepository) Create(ctx context.Context, req dto.ProjectDto) error {
 	query := `
 	INSERT INTO projects 
-	(title, description, tech_stack, demo_url, github_url, filepath) 
-	VALUES (?, ?, ?, ?, ?, ?)
+	(id, title, description, tech_stack, demo_url, github_url, filepath) 
+	VALUES (?, ?, ?, ?, ?, ?, ?)
 	`
-	_, err := r.db.ExecContext(ctx, query, req.Title, req.Description, req.TechStack, req.DemoUrl, req.GithubUrl, req.FilePath)
+	_, err := r.db.ExecContext(ctx, query, req.ID, req.Title, req.Description, req.TechStack, req.DemoUrl, req.GithubUrl, req.FilePath)
 
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func (r *ProjectRepository) GetAll(ctx context.Context) ([]dto.ProjectDto, error) {
+	query := `SELECT * FROM projects`
+	rows, err := r.db.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	BASE_URL := "http://localhost:8080/"
+	var res = make([]dto.ProjectDto, 0)
+	for rows.Next() {
+		var r dto.ProjectDto
+		rows.Scan(&r.ID, &r.Title, &r.Description, &r.TechStack, &r.DemoUrl, &r.GithubUrl, &r.FilePath)
+		res = append(res,
+			dto.ProjectDto{
+				ID:          r.ID,
+				Title:       r.Title,
+				Description: r.Description,
+				TechStack:   r.TechStack,
+				DemoUrl:     r.DemoUrl,
+				GithubUrl:   r.GithubUrl,
+				FilePath:    BASE_URL + r.FilePath,
+			},
+		)
+	}
+
+	return res, nil
 }

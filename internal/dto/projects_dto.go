@@ -7,5 +7,5 @@ type ProjectDto struct {
 	TechStack   string `json:"techStack"`
 	DemoUrl     string `json:"demoUrl"`
 	GithubUrl   string `json:"githubUrl"`
-	FilePath    string
+	FilePath    string `json:"FilePath"`
 }

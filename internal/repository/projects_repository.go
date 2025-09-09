@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"os"
 
 	"github.com/siroj05/portfolio/internal/dto"
 )
@@ -59,9 +60,84 @@ func (r *ProjectRepository) GetAll(ctx context.Context) ([]dto.ProjectDto, error
 }
 
 func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
-	_, err := r.db.ExecContext(ctx, `DELETE FROM projects WHERE id = ?`, id)
+
+	/* fix gambar ga ke hapus di storage
+	*Ambil dulu path nya dari db
+	*Terus hapus sesuai path dan name file nya
+	 */
+	var filePath string
+	err := r.db.QueryRowContext(ctx, "SELECT filepath FROM projects WHERE id = ?", id).Scan(&filePath)
+	if err != nil {
+		return err
+	}
+
+	// fungsi hapus file
+	if filePath != "" {
+		err = os.Remove(filePath)
+		if err != nil && !os.IsNotExist(err) {
+			// balikin error, note : error bukan karena file ga ada
+			return err
+		}
+	}
+
+	_, err = r.db.ExecContext(ctx, `DELETE FROM projects WHERE id = ?`, id)
 	if err != nil {
 		return err
 	}
 	return err
+}
+
+func (r *ProjectRepository) GetById(ctx context.Context, id string, res *dto.ProjectDto) error {
+	row := r.db.QueryRowContext(ctx, `SELECT * FROM projects WHERE id = ?`, id)
+	err := row.Scan(&res.ID, &res.Title, &res.Description, &res.TechStack, &res.DemoUrl, &res.GithubUrl, &res.FilePath)
+	if err != nil {
+		return err
+	}
+	BASE_URL := "http://localhost:8080/"
+	res.FilePath = BASE_URL + res.FilePath
+
+	return nil
+}
+
+func (r *ProjectRepository) Update(ctx context.Context, req dto.ProjectDto) error {
+	// kalo update ambil dulu data lama
+	var oldFilePath string
+	err := r.db.QueryRowContext(ctx, `SELECT filepath FROM projects WHERE id = ?`, req.ID).Scan(&oldFilePath)
+	if err != nil {
+		return err
+	}
+
+	// ni kalo gambar di ganti
+	if req.FilePath != "" {
+		// lu hapus ni file lama disini fungsinya
+		if oldFilePath != "" {
+			_ = os.Remove(oldFilePath)
+		}
+
+		// disini updatenya
+		_, err = r.db.ExecContext(ctx,
+			`UPDATE projects
+			SET title = ?, SET description = ?, SET tech_stack = ?, SET demo_url = ?, SET github_url = ?, SET filepath = ?
+			WHERE id = ?
+			`,
+			req.Title, req.Description, req.TechStack, req.DemoUrl, req.GithubUrl, req.FilePath, req.ID,
+		)
+
+		if err != nil {
+			return err
+		}
+	} else {
+		// ni buat kalo lo update tapi ga ganti gambar
+		_, err = r.db.ExecContext(ctx,
+			`UPDATE projects
+			SET title = ?, SET description = ?, SET tech_stack = ?, SET demo_url = ?, SET github_url = ?
+			WHERE id = ?
+			`,
+			req.Title, req.Description, req.TechStack, req.DemoUrl, req.GithubUrl, req.ID,
+		)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

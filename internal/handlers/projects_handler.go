@@ -56,7 +56,6 @@ func (h *ProjectsHandler) CreateProject(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	defer dst.Close()
 	_, err = io.Copy(dst, file)
 	if err != nil {
 		log.Println("error 4")
@@ -76,10 +75,16 @@ func (h *ProjectsHandler) CreateProject(w http.ResponseWriter, r *http.Request) 
 	}
 
 	err = h.Repo.Create(ctx, req)
-
+	dst.Close()
 	if err != nil {
 		log.Println("error 5")
 		log.Println(err)
+		if req.FilePath != "" {
+			err = os.Remove(filePath)
+			if err != nil {
+				log.Println(err)
+			}
+		}
 		response.Error(w, http.StatusInternalServerError, "Failed to create project", err.Error())
 		return
 	}
@@ -137,21 +142,17 @@ func (h *ProjectsHandler) UpdateProject(w http.ResponseWriter, r *http.Request) 
 	ctx := context.Background()
 
 	// ambil id dari URL
-	vars := mux.Vars(r)
-	id := vars["id"]
 
 	// parse multipart form
 	err := r.ParseMultipartForm(10 << 20) // buat ngelimit size
 	if err != nil {
-		log.Println("error 1")
-		log.Println(err)
 		response.Error(w, http.StatusBadRequest, "File too big", err.Error())
 		return
 	}
 
 	// ambil file
 	req := dto.ProjectDto{
-		ID:          id,
+		ID:          r.FormValue("id"),
 		Title:       r.FormValue("title"),
 		Description: r.FormValue("description"),
 		TechStack:   r.FormValue("techStack"),
@@ -172,9 +173,9 @@ func (h *ProjectsHandler) UpdateProject(w http.ResponseWriter, r *http.Request) 
 			response.Error(w, http.StatusInternalServerError, "Unable to save file", err.Error())
 			return
 		}
-		defer dst.Close()
 
 		_, err = io.Copy(dst, file)
+		dst.Close()
 		if err != nil {
 			response.Error(w, http.StatusInternalServerError, "Error saving file", err.Error())
 			return
@@ -186,6 +187,13 @@ func (h *ProjectsHandler) UpdateProject(w http.ResponseWriter, r *http.Request) 
 	// update ke repo
 	err = h.Repo.Update(ctx, req)
 	if err != nil {
+		// kalo update gagal kena error hapus filenya biar ga nyangkut
+		if req.FilePath != "" {
+			err = os.Remove(req.FilePath)
+			if err != nil {
+				log.Println(err)
+			}
+		}
 		response.Error(w, http.StatusInternalServerError, "Failed to update project", err.Error())
 		return
 	}

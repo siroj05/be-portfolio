@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"log"
 	"os"
 
 	"github.com/siroj05/portfolio/internal/dto"
@@ -59,6 +60,7 @@ func (r *ProjectRepository) GetAll(ctx context.Context) ([]dto.ProjectDto, error
 	return res, nil
 }
 
+// next handle kalo delete gagal gambar tetap ada
 func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
 
 	/* fix gambar ga ke hapus di storage
@@ -72,17 +74,16 @@ func (r *ProjectRepository) Delete(ctx context.Context, id string) error {
 	}
 
 	// fungsi hapus file
+	_, err = r.db.ExecContext(ctx, `DELETE FROM projects WHERE id = ?`, id)
+	if err != nil {
+		return err
+	}
 	if filePath != "" {
 		err = os.Remove(filePath)
 		if err != nil && !os.IsNotExist(err) {
 			// balikin error, note : error bukan karena file ga ada
 			return err
 		}
-	}
-
-	_, err = r.db.ExecContext(ctx, `DELETE FROM projects WHERE id = ?`, id)
-	if err != nil {
-		return err
 	}
 	return err
 }
@@ -104,9 +105,9 @@ func (r *ProjectRepository) Update(ctx context.Context, req dto.ProjectDto) erro
 	var oldFilePath string
 	err := r.db.QueryRowContext(ctx, `SELECT filepath FROM projects WHERE id = ?`, req.ID).Scan(&oldFilePath)
 	if err != nil {
+		log.Println("error disini")
 		return err
 	}
-
 	// ni kalo gambar di ganti
 	if req.FilePath != "" {
 		// lu hapus ni file lama disini fungsinya
@@ -117,12 +118,17 @@ func (r *ProjectRepository) Update(ctx context.Context, req dto.ProjectDto) erro
 		// disini updatenya
 		_, err = r.db.ExecContext(ctx,
 			`UPDATE projects
-			SET title = ?, SET description = ?, SET tech_stack = ?, SET demo_url = ?, SET github_url = ?, SET filepath = ?
+			SET 
+			title = ?, 
+			description = ?, 
+			tech_stack = ?, 
+			demo_url = ?, 
+			github_url = ?, 
+			filepath = ?
 			WHERE id = ?
 			`,
 			req.Title, req.Description, req.TechStack, req.DemoUrl, req.GithubUrl, req.FilePath, req.ID,
 		)
-
 		if err != nil {
 			return err
 		}
@@ -130,7 +136,12 @@ func (r *ProjectRepository) Update(ctx context.Context, req dto.ProjectDto) erro
 		// ni buat kalo lo update tapi ga ganti gambar
 		_, err = r.db.ExecContext(ctx,
 			`UPDATE projects
-			SET title = ?, SET description = ?, SET tech_stack = ?, SET demo_url = ?, SET github_url = ?
+			SET 
+			title = ?, 
+			description = ?, 
+			tech_stack = ?, 
+			demo_url = ?, 
+			github_url = ?
 			WHERE id = ?
 			`,
 			req.Title, req.Description, req.TechStack, req.DemoUrl, req.GithubUrl, req.ID,

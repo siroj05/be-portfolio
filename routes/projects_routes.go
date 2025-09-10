@@ -19,4 +19,5 @@ func ProjectsRoutes(r *mux.Router, db *sql.DB) {
 	r.Handle("/projects", middleware.JWTauth(http.HandlerFunc(handler.GetAllProjects))).Methods("GET")
 	r.Handle("/projects/{id:[0-9a-fA-F\\-]{36}}", middleware.JWTauth(http.HandlerFunc(handler.DeleteProject))).Methods("DELETE")
 	r.Handle("/projects/{id:[0-9a-fA-F\\-]{36}}", middleware.JWTauth(http.HandlerFunc(handler.GetProjectById))).Methods("GET")
+	r.Handle("/projects/update", middleware.JWTauth(http.HandlerFunc(handler.UpdateProject))).Methods("PUT")
 }

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/siroj05/portfolio/internal/dto"
+	"github.com/siroj05/portfolio/internal/middleware"
 	"github.com/siroj05/portfolio/internal/repository/interfaces"
 	"github.com/siroj05/portfolio/internal/response"
 )
@@ -90,4 +91,31 @@ func (h *AuthHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
 		"message": "User created successfully",
 	})
+}
+
+func (h *AuthHandler) GetDataUser(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	claims, ok := middleware.GetClaims(r)
+	if !ok {
+		response.Error(w, http.StatusUnauthorized, "Unauthorized", ok)
+		return
+	}
+
+	userId, ok := claims["userId"].(float64)
+	if !ok {
+		response.Error(w, http.StatusBadRequest, "Invalid token", ok)
+		return
+	}
+
+	ctx := context.Background()
+
+	var res dto.GetMeDto
+
+	err := h.Repo.GetMe(ctx, &res, int64(userId))
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "Internal server error", err.Error())
+		return
+	}
+
+	response.Success(w, "Successfully get profile data", res)
 }

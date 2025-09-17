@@ -72,3 +72,14 @@ func (r *AuthRepository) Create(ctx context.Context, req dto.LoginDto) error {
 
 	return nil
 }
+
+func (r *AuthRepository) GetMe(ctx context.Context, res *dto.GetMeDto, id int64) error {
+	row := r.db.QueryRowContext(ctx, "SELECT id, name FROM user WHERE id = ?", id)
+	err := row.Scan(&res.ID, &res.Name)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -26,13 +27,22 @@ func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
 	ctx := context.Background()
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
+		log.Println("error 1 = ", err)
 		response.Error(w, http.StatusBadRequest, "Failed to parse form", err.Error())
 		return
 	}
 
 	file, handler, err := r.FormFile("image")
+	// convert string ke int
+	i64, err := strconv.ParseInt(r.FormValue("userId"), 10, 64)
+	if err != nil {
+		log.Println("error 5 = ", err)
+		response.Error(w, http.StatusInternalServerError, "Internal server error", err.Error())
+		return
+	}
 
 	if err != nil && err != http.ErrMissingFile {
+		log.Println("error 2 = ", err)
 		response.Error(w, http.StatusBadRequest, "Failed to read the file", err.Error())
 		return
 	}
@@ -50,8 +60,19 @@ func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
 		newFileName := fmt.Sprintf("uploads/%d_%s", time.Now().UnixNano(), handler.Filename)
 		filePath = newFileName
 
+		oldFilePath, err := h.Repo.IsFileExist(i64)
+		log.Println("error 2.5 = ", err)
+		if err != nil {
+			response.Error(w, http.StatusInternalServerError, "Internal server error", err.Error())
+		}
+		log.Println(oldFilePath)
+		if oldFilePath != "" {
+			_ = os.Remove(oldFilePath)
+		}
+
 		dst, err := os.Create(filePath)
 		if err != nil {
+			log.Println("error 3 = ", err)
 			response.Error(w, http.StatusInternalServerError, "Internal server error", err.Error())
 			return
 		}
@@ -59,16 +80,10 @@ func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
 
 		_, err = io.Copy(dst, file)
 		if err != nil {
+			log.Println("error 4 = ", err)
 			response.Error(w, http.StatusInternalServerError, "Failed to write file", err.Error())
 			return
 		}
-	}
-
-	// convert string ke int
-	i64, err := strconv.ParseInt(r.FormValue("userId"), 10, 64)
-	if err != nil {
-		response.Error(w, http.StatusInternalServerError, "Internal server error", err.Error())
-		return
 	}
 
 	req := dto.ProfileDto{
@@ -85,6 +100,7 @@ func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
 	err = h.Repo.Create(ctx, req)
 
 	if err != nil {
+		log.Println("error 6 = ", err)
 		if filePath != "" {
 			os.Remove(filePath)
 		}

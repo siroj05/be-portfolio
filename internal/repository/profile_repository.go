@@ -33,6 +33,15 @@ func (r *ProfileRepsitory) GetById(ctx context.Context, res *dto.ProfileDto, id 
 	return nil
 }
 
+func (r *ProfileRepsitory) IsFileExist(id int64) (string, error) {
+	var oldFilePath string
+	err := r.db.QueryRow("SELECT image_path FROM profile WHERE user_id = ?", id).Scan(&oldFilePath)
+	if err != nil {
+		return "", err
+	}
+	return oldFilePath, nil
+}
+
 func (r *ProfileRepsitory) Create(ctx context.Context, req dto.ProfileDto) error {
 
 	tx, err := r.db.Begin()

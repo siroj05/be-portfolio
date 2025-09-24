@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/siroj05/portfolio/internal/dto"
 	"github.com/siroj05/portfolio/internal/repository/interfaces"
 	"github.com/siroj05/portfolio/internal/response"
@@ -109,4 +110,25 @@ func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.Success(w, "Successfully to save profile", nil)
+}
+
+func (h *ProfileHandler) GetProfileById(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	ctx := context.Background()
+	params := mux.Vars(r)
+	id := params["id"]
+	i64, err := strconv.Atoi(id)
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "Internal server error", err.Error())
+		return
+	}
+
+	var res dto.ProfileDto
+	err = h.Repo.GetById(ctx, &res, int64(i64))
+	if err != nil {
+		response.Error(w, http.StatusInternalServerError, "Failed to get data", err.Error())
+		return
+	}
+
+	response.Success(w, "Success", res)
 }

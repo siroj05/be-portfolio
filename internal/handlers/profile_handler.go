@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"io"
 	"log"
@@ -97,6 +98,14 @@ func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
 		Linkedin:   r.FormValue("linkedin"),
 		Repository: r.FormValue("repository"),
 		About:      r.FormValue("about"),
+		PhoneNumber: sql.NullString{
+			String: r.FormValue("phoneNumber"),
+			Valid:  r.FormValue("phoneNumber") != "",
+		},
+		Location: sql.NullString{
+			String: r.FormValue("location"),
+			Valid:  r.FormValue("location") != "",
+		},
 	}
 	err = h.Repo.Create(ctx, req)
 
@@ -114,18 +123,35 @@ func (h *ProfileHandler) CreateProfile(w http.ResponseWriter, r *http.Request) {
 
 func (h *ProfileHandler) GetProfileById(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+	log.Println("Masukk")
 	ctx := context.Background()
 	params := mux.Vars(r)
 	id := params["id"]
 	i64, err := strconv.Atoi(id)
 	if err != nil {
+		log.Println("error 1", err)
 		response.Error(w, http.StatusInternalServerError, "Internal server error", err.Error())
 		return
 	}
 
-	var res dto.ProfileDto
+	var res dto.ResponseProfileDto
 	err = h.Repo.GetById(ctx, &res, int64(i64))
 	if err != nil {
+		log.Println("error 2", err)
+		response.Error(w, http.StatusInternalServerError, "Failed to get data", err.Error())
+		return
+	}
+
+	response.Success(w, "Success", res)
+}
+
+func (h *ProfileHandler) GetProfile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	ctx := context.Background()
+	res, err := h.Repo.Get(ctx)
+	if err != nil {
+		log.Println("error 3", err)
 		response.Error(w, http.StatusInternalServerError, "Failed to get data", err.Error())
 		return
 	}

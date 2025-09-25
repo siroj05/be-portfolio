@@ -15,5 +15,6 @@ func ProfileRoutes(r *mux.Router, db *sql.DB) {
 	handler := handlers.NewProfileHandler(repo)
 
 	r.Handle("/profile/save", middleware.JWTauth(http.HandlerFunc(handler.CreateProfile))).Methods("POST")
-	r.Handle("/profile/{id}", middleware.JWTauth(http.HandlerFunc(handler.GetProfileById))).Methods("GET")
+	r.Handle("/profile/{id:[0-9]+}", middleware.JWTauth(http.HandlerFunc(handler.GetProfileById))).Methods("GET")
+	r.HandleFunc("/profile/me", handler.GetProfile).Methods("GET")
 }

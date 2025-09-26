@@ -12,6 +12,7 @@ import (
 	"github.com/siroj05/portfolio/internal/dto"
 	"github.com/siroj05/portfolio/internal/repository/interfaces"
 	"github.com/siroj05/portfolio/internal/response"
+	"github.com/siroj05/portfolio/utils"
 )
 
 type MessagesHandler struct {
@@ -28,8 +29,16 @@ func (h *MessagesHandler) CreateMessage(w http.ResponseWriter, r *http.Request) 
 	w.Header().Set("Content-Type", "application/json")
 	ctx := context.Background()
 
+	// verifikasi token turnstile
+	token := r.FormValue("token")
+	ok, err := utils.VerifyTurnstile(token)
+	if err != nil || !ok {
+		response.Error(w, http.StatusBadRequest, "Captcha invalid", err.Error())
+		return
+	}
+
 	var req dto.MessageDto
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err = json.NewDecoder(r.Body).Decode(&req)
 
 	if err != nil {
 		response.Error(w, http.StatusBadRequest, "Invalid request body", err.Error())

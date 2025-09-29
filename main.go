@@ -13,6 +13,7 @@ import (
 
 func main() {
 	config.LoadEnv()
+	config.LoadImgUrl()
 	config.GetConnection()
 	defer config.DB.Close()
 

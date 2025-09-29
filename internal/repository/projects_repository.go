@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/siroj05/portfolio/config"
 	"github.com/siroj05/portfolio/internal/dto"
 )
 
@@ -39,7 +40,7 @@ func (r *ProjectRepository) GetAll(ctx context.Context) ([]dto.ProjectDto, error
 		return nil, err
 	}
 	defer rows.Close()
-	BASE_URL := "http://localhost:8080/"
+	BASE_URL := config.BaseUrlImg
 	var res = make([]dto.ProjectDto, 0)
 	for rows.Next() {
 		var r dto.ProjectDto
@@ -94,7 +95,7 @@ func (r *ProjectRepository) GetById(ctx context.Context, id string, res *dto.Pro
 	if err != nil {
 		return err
 	}
-	BASE_URL := "http://localhost:8080/"
+	BASE_URL := config.BaseUrlImg
 	res.FilePath = BASE_URL + res.FilePath
 
 	return nil

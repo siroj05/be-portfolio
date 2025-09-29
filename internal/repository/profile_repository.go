@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/google/uuid"
+	"github.com/siroj05/portfolio/config"
 	"github.com/siroj05/portfolio/internal/dto"
 )
 
@@ -27,8 +28,8 @@ func (r *ProfileRepsitory) GetById(ctx context.Context, res *dto.ResponseProfile
 		}
 		return err
 	}
-	BASE_URL := "http://localhost:8080/"
-	res.ImagePath = BASE_URL + res.ImagePath
+
+	res.ImagePath = config.BaseUrlImg + res.ImagePath
 
 	return nil
 }
@@ -134,7 +135,7 @@ func (r *ProfileRepsitory) Get(ctx context.Context) ([]dto.ResponseProfileDto, e
 	defer rows.Close()
 
 	var res = make(map[string]*dto.ResponseProfileDto)
-	BASE_URL := "http://localhost:8080/"
+	BASE_URL := config.BaseUrlImg
 	for rows.Next() {
 		var (
 			ID          string

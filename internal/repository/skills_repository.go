@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/google/uuid"
+	"github.com/siroj05/portfolio/config"
 	"github.com/siroj05/portfolio/internal/dto"
 )
 
@@ -52,7 +53,7 @@ func (r *SkillsRepository) GetAll(ctx context.Context) ([]dto.CategoriesDto, err
 	defer rows.Close()
 
 	categoriesMap := make(map[string]*dto.CategoriesDto)
-	BASE_URL := "http://localhost:8080/"
+	BASE_URL := config.BaseUrlImg
 	for rows.Next() {
 		var (
 			categoryID   string

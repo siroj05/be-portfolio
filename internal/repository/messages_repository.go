@@ -27,7 +27,7 @@ func NewMessagesRepository(db *sql.DB) *MessagesRepository {
 * CreateMessage adalah method yang digunakan untuk menyimpan pesan baru ke dalam database.
  */
 
-func (r *MessagesRepository) Create(ctx context.Context, req dto.MessageDto) error {
+func (r *MessagesRepository) Create(ctx context.Context, req dto.CreateMessageDto) error {
 	query := "INSERT INTO messages (email, message, is_read) VALUES (?, ?, ?)"
 
 	_, err := r.db.ExecContext(ctx, query, req.Email, req.Message, req.IsRead)

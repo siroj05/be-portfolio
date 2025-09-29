@@ -7,7 +7,7 @@ import (
 )
 
 type MessagesRepository interface {
-	Create(ctx context.Context, message dto.MessageDto) error
+	Create(ctx context.Context, message dto.CreateMessageDto) error
 	GetAll(ctx context.Context) ([]dto.MessageDto, error)
 	Delete(ctx context.Context, id int64) error
 	DeleteAll(ctx context.Context) error

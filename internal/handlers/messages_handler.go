@@ -28,20 +28,26 @@ func NewMessagesHandler(repo interfaces.MessagesRepository) *MessagesHandler {
 func (h *MessagesHandler) CreateMessage(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	ctx := context.Background()
-
-	// verifikasi token turnstile
-	token := r.FormValue("token")
-	ok, err := utils.VerifyTurnstile(token)
-	if err != nil || !ok {
-		response.Error(w, http.StatusBadRequest, "Captcha invalid", err.Error())
-		return
-	}
-
-	var req dto.MessageDto
-	err = json.NewDecoder(r.Body).Decode(&req)
+	var req dto.CreateMessageDto
+	err := json.NewDecoder(r.Body).Decode(&req)
 
 	if err != nil {
 		response.Error(w, http.StatusBadRequest, "Invalid request body", err.Error())
+		return
+	}
+
+	// verifikasi token turnstile
+	ok, err := utils.VerifyTurnstile(req.Token)
+	if err != nil || !ok {
+
+		msg := "Invalid captcha"
+		detail := ""
+		if err != nil {
+			detail = err.Error()
+			msg = "Captcha error"
+		}
+
+		response.Error(w, http.StatusBadRequest, msg, detail)
 		return
 	}
 

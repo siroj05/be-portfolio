@@ -83,3 +83,27 @@ func (r *AuthRepository) GetMe(ctx context.Context, res *dto.GetMeDto, id int64)
 
 	return nil
 }
+
+func (r *AuthRepository) ResetPassword(ctx context.Context, req dto.ForgotPasswordDto) error {
+	hashedPassword, err := utils.HashPassword(req.Password)
+	if err != nil {
+		return err
+	}
+
+	result, err := r.db.ExecContext(ctx, "UPDATE user SET password = ? WHERE name = ?", hashedPassword, req.Name)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected == 0 {
+		return fmt.Errorf("user not found")
+	}
+
+	return nil
+}
+

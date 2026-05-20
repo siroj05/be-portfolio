@@ -28,16 +28,25 @@ func (r *ExperiencesRepository) Delete(ctx context.Context, id string) error {
 	return nil
 }
 
+func parseDateString(dateStr string) string {
+	if strings.Contains(dateStr, "T") {
+		return strings.Split(dateStr, "T")[0]
+	}
+	return dateStr
+}
+
 func (r *ExperiencesRepository) Create(ctx context.Context, req dto.ExperiencesDto) error {
 	id := uuid.New().String()
+	start := parseDateString(req.Start)
+	
 	var end interface{}
 	if strings.TrimSpace(req.End) == "" {
 		end = nil
 	} else {
-		end = req.End
+		end = parseDateString(req.End)
 	}
 
-	_, err := r.db.ExecContext(ctx, "INSERT INTO experiences (id, office, position, start, end, description, present) VALUES (?, ?, ?, ?, ?, ?, ?)", id, req.Office, req.Position, req.Start, end, req.Description, req.Present)
+	_, err := r.db.ExecContext(ctx, "INSERT INTO experiences (id, office, position, start, end, description, present) VALUES (?, ?, ?, ?, ?, ?, ?)", id, req.Office, req.Position, start, end, req.Description, req.Present)
 	if err != nil {
 		return err
 	}
@@ -57,13 +66,15 @@ func (r *ExperiencesRepository) Update(ctx context.Context, req dto.ExperiencesD
 	present = ?
 	WHERE id = ?
 	`
+	start := parseDateString(req.Start)
+
 	var end interface{}
 	if strings.TrimSpace(req.End) == "" {
 		end = nil
 	} else {
-		end = req.End
+		end = parseDateString(req.End)
 	}
-	_, err := r.db.ExecContext(ctx, query, req.Office, req.Position, req.Start, end, req.Description, req.Present, req.ID)
+	_, err := r.db.ExecContext(ctx, query, req.Office, req.Position, start, end, req.Description, req.Present, req.ID)
 	if err != nil {
 		return err
 	}

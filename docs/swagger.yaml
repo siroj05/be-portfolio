@@ -1,0 +1,181 @@
+basePath: /
+definitions:
+  dto.ForgotPasswordDto:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.GetMeDto:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
+  dto.LoginDto:
+    properties:
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  response.Response:
+    properties:
+      data: {}
+      error: {}
+      messages:
+        type: string
+      status:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server for Portfolio Website.
+  title: Portfolio API
+  version: "1.0"
+paths:
+  /auth/forgot:
+    post:
+      consumes:
+      - application/json
+      description: Resets/changes password for a specified user
+      parameters:
+      - description: Reset password payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ForgotPasswordDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password updated successfully
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request payload
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to reset password
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Forgot Password
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates user and sets session cookie
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login success message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request payload
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: User Login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      description: Clears user session cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logout success message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: User Logout
+      tags:
+      - Auth
+  /auth/me:
+    get:
+      description: Retrieves the authenticated user profile details
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully get profile data
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.GetMeDto'
+              type: object
+        "400":
+          description: Invalid token
+          schema:
+            $ref: '#/definitions/response.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Get Current Profile
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new admin/user
+      parameters:
+      - description: User credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: User registration success message
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request payload
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Failed to create user
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Register a User
+      tags:
+      - Auth
+swagger: "2.0"

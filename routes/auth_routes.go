@@ -17,5 +17,6 @@ func AuthRoutes(r *mux.Router, db *sql.DB) {
 	r.HandleFunc("/auth/login", handler.LoginUser).Methods("POST")
 	r.HandleFunc("/auth/register", handler.CreateUser).Methods("POST")
 	r.HandleFunc("/auth/logout", handler.LogoutUser).Methods("POST")
+	r.HandleFunc("/auth/forgot", handler.ForgotPassword).Methods("POST")
 	r.Handle("/auth/me", middleware.JWTauth(http.HandlerFunc(handler.GetDataUser))).Methods("GET")
 }

@@ -9,3 +9,9 @@ type GetMeDto struct {
 	ID   int64  `json:"id"`
 	Name string `json:"name"`
 }
+
+type ForgotPasswordDto struct {
+	Name     string `json:"name"`
+	Password string `json:"password"`
+}
+

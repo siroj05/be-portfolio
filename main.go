@@ -1,3 +1,8 @@
+// @title Portfolio API
+// @version 1.0
+// @description API Server for Portfolio Website.
+// @host localhost:8080
+// @BasePath /
 package main
 
 import (
@@ -6,6 +11,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
+	_ "github.com/siroj05/portfolio/docs"
+	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/siroj05/portfolio/config"
 	"github.com/siroj05/portfolio/internal/middleware"
 	"github.com/siroj05/portfolio/routes"
@@ -18,12 +25,17 @@ func main() {
 	defer config.DB.Close()
 
 	r := mux.NewRouter()
+	
+	// Swagger UI route
+	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
+
 	routes.MessagesRoutes(r, config.DB)
 	routes.AuthRoutes(r, config.DB)
 	routes.ExperiencesRoutes(r, config.DB)
 	routes.ProjectsRoutes(r, config.DB)
 	routes.SkillsRoutes(r, config.DB)
 	routes.ProfileRoutes(r, config.DB)
+	routes.HealthRoutes(r, config.DB)
 	// handle with middleware
 	handlerWithMiddleware := middleware.Logging(r)
 

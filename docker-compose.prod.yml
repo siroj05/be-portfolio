@@ -33,6 +33,8 @@ services:
       DB_PASSWORD: p0rtf0l1o_S3cur3_Db_2026
       DB_NAME: portfolio
       JWT_SECRET: bottleneck05
+      # Ganti dengan domain produksi Anda, contoh: https://siroj-portfolio.com/ atau http://43.157.248.30:8080/
+      BASE_IMAGE_URL: http://43.157.248.30:8080/
     networks:
       - portfolio_net
       - caddy_net

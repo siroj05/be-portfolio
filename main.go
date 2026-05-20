@@ -11,11 +11,11 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	_ "github.com/siroj05/portfolio/docs"
-	httpSwagger "github.com/swaggo/http-swagger"
 	"github.com/siroj05/portfolio/config"
+	_ "github.com/siroj05/portfolio/docs"
 	"github.com/siroj05/portfolio/internal/middleware"
 	"github.com/siroj05/portfolio/routes"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func main() {
@@ -25,10 +25,11 @@ func main() {
 	defer config.DB.Close()
 
 	r := mux.NewRouter()
-	
+
 	// Swagger UI route
 	r.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
+	// routes API endpoint
 	routes.MessagesRoutes(r, config.DB)
 	routes.AuthRoutes(r, config.DB)
 	routes.ExperiencesRoutes(r, config.DB)

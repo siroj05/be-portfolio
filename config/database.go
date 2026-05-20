@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
+	"github.com/siroj05/portfolio/database"
 )
 
 /*
@@ -21,7 +22,7 @@ func GetConnection() {
 	// Kode untuk mendapatkan koneksi ke database
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		log.Println("Note: .env file not found, using environmental variables.")
 	}
 
 	user := os.Getenv("DB_USER")
@@ -31,13 +32,24 @@ func GetConnection() {
 	name := os.Getenv("DB_NAME")
 
 	// data source name
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, name)
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", user, password, host, port, name)
 
-	// koneksi ke db
-	db, err := sql.Open("mysql", dsn)
+	// koneksi ke db dengan retry
+	var db *sql.DB
+	for i := 0; i < 15; i++ {
+		db, err = sql.Open("mysql", dsn)
+		if err == nil {
+			err = db.Ping()
+			if err == nil {
+				break
+			}
+		}
+		log.Printf("Waiting for database connection... Attempt %d/15. Error: %v", i+1, err)
+		time.Sleep(3 * time.Second)
+	}
 	if err != nil {
 		log.Println(err)
-		log.Fatal("Error connecting to database")
+		log.Fatal("Could not connect to database after 15 attempts")
 	}
 
 	db.SetMaxIdleConns(10)
@@ -45,5 +57,9 @@ func GetConnection() {
 	db.SetConnMaxIdleTime(5 * time.Minute)
 	db.SetConnMaxLifetime(60 * time.Minute)
 
+	// Run migrations
+	database.RunMigrations(db)
+
 	DB = db
 }
+

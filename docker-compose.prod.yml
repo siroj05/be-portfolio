@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: deploy-portfolio
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_S3cur3_Db_2026
+      MYSQL_DATABASE: portfolio
+      MYSQL_USER: portfolio_user
+      MYSQL_PASSWORD: p0rtf0l1o_S3cur3_Db_2026
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - portfolio_db_data:/var/lib/mysql
+    networks:
+      - portfolio_net
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: deploy-be-portfolio
+    restart: always
+    depends_on:
+      db:
+        condition: service_started
+    environment:
+      DB_HOST: deploy-portfolio
+      DB_PORT: 3306
+      DB_USER: portfolio_user
+      DB_PASSWORD: p0rtf0l1o_S3cur3_Db_2026
+      DB_NAME: portfolio
+      JWT_SECRET: bottleneck05
+    networks:
+      - portfolio_net
+      - caddy_net
+
+volumes:
+  portfolio_db_data:
+
+networks:
+  portfolio_net:
+  caddy_net:
+    name: my-saas_default
+    external: true
